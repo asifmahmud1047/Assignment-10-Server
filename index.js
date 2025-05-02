@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.5b559.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -36,6 +36,13 @@ async function run() {
       const result = await data.toArray();
       res.send(result);
     });
+
+     app.get("/visa/:id", async (req, res) => {
+       const id = req.params.id;
+       const query = { _id: new ObjectId(id) };
+       const result = await visaColection.findOne(query);
+       res.send(result);
+     });
 
     app.post("/visa", async (req, res) => {
       const Newvisa = req.body;
