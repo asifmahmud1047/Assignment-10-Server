@@ -50,6 +50,12 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/apply", async (req, res) => {
+      const Apply = req.body;
+      const result = await visaColection.insertOne(Apply);
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
