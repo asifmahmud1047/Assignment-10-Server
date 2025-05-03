@@ -39,6 +39,28 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/visa/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const data = req.body;
+      const options = { upsert: true };
+      const updateData = {
+        $set: {
+          name: data.name,
+          description: data.description,
+          age: data.age,
+          applicationMethod: data.applicationMethod,
+          validity: data.validity,
+          fee: data.fee,
+          time: data.time,
+          visaType: data.visaType,
+        },
+      };
+      const result = await visaColection.updateOne(query, updateData, options);
+
+      res.send(result);
+    });
+
     app.get("/latest-visas", async (req, res) => {
       const data = visaColection.find().sort({ _id: -1 }).limit(6);
       const result = await data.toArray();
@@ -60,10 +82,8 @@ async function run() {
 
     app.get("/my-visas", async (req, res) => {
       const email = req.query.email;
-      if (!email) {
-        return res.status(400).send({ message: "Email is required" });
-      }
-      const query = { user_email: email };
+
+      const query = { email: email };
       const data = visaColection.find(query);
       const result = await data.toArray();
       res.send(result);
@@ -72,16 +92,18 @@ async function run() {
     app.delete("/visa/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      try {
-        const result = await visaColection.deleteOne(query);
-        res.send(result);
-      } catch (error) {
-        res.status(500).send({ message: "Failed to delete visa", error });
-      }
+
+      const result = await visaColection.deleteOne(query);
+      res.send(result);
     });
 
     app.get("/apply", async (req, res) => {
-      const data = applyColection.find();
+      const { searchPrams } = req.query;
+      let option = {};
+      if (searchPrams) {
+        option = { name: { $regex: searchPrams, $options: "i" } };
+      }
+      const data = applyColection.find(option);
       const result = await data.toArray();
       res.send(result);
     });
