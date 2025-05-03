@@ -11,7 +11,6 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.5b559.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -31,18 +30,21 @@ async function run() {
     const database = client.db("visaDB");
     const visaColection = database.collection("Allvisa");
 
+    const Database = client.db("applyDB");
+    const applyColection = Database.collection("Allapply");
+
     app.get("/visa", async (req, res) => {
       const data = visaColection.find();
       const result = await data.toArray();
       res.send(result);
     });
 
-     app.get("/visa/:id", async (req, res) => {
-       const id = req.params.id;
-       const query = { _id: new ObjectId(id) };
-       const result = await visaColection.findOne(query);
-       res.send(result);
-     });
+    app.get("/visa/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await visaColection.findOne(query);
+      res.send(result);
+    });
 
     app.post("/visa", async (req, res) => {
       const Newvisa = req.body;
@@ -50,9 +52,22 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/apply", async (req, res) => {
+      const data = applyColection.find();
+      const result = await data.toArray();
+      res.send(result);
+    });
+
     app.post("/apply", async (req, res) => {
       const Apply = req.body;
-      const result = await visaColection.insertOne(Apply);
+      const result = await applyColection.insertOne(Apply);
+      res.send(result);
+    });
+
+    app.delete("/apply/:id", async (req, res) => {
+      const data = req.params.id;
+      const query = { _id: new ObjectId(data) };
+      const result = await applyColection.deleteOne(query);
       res.send(result);
     });
 
