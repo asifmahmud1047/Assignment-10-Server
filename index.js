@@ -58,6 +58,17 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/my-visas", async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        return res.status(400).send({ message: "Email is required" });
+      }
+      const query = { user_email: email };
+      const data = visaColection.find(query);
+      const result = await data.toArray();
+      res.send(result);
+    });
+
     app.get("/apply", async (req, res) => {
       const data = applyColection.find();
       const result = await data.toArray();
