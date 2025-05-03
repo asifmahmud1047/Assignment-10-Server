@@ -39,6 +39,12 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/latest-visas", async (req, res) => {
+      const data = visaColection.find().sort({ _id: -1 }).limit(6);
+      const result = await data.toArray();
+      res.send(result);
+    });
+
     app.get("/visa/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
